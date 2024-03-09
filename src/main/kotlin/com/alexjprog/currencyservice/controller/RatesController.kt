@@ -16,7 +16,7 @@ class RatesController @Autowired constructor(
     @GetMapping
     fun getRates(
         @RequestParam("from_cur", defaultValue = "UAH") fromCurrencyName: String,
-        @RequestParam("to_curs", required = false) toCurrencyNames: List<String>
+        @RequestParam("to_curs", required = false, defaultValue = "") toCurrencyNames: List<String>
     ): RatesResponse {
         return RatesResponse(
             inputCurrencyName = fromCurrencyName,

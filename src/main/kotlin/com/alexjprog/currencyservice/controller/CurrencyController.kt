@@ -15,7 +15,7 @@ class CurrencyController @Autowired constructor(
 ) {
     @GetMapping
     fun getCurrenciesInfo(
-        @RequestParam("req_curs", required = false) requestedCurrencyNames: List<String>
+        @RequestParam("req_curs", required = false, defaultValue = "") requestedCurrencyNames: List<String>
     ): List<CurrencyResponse> {
         return currencyService.getAvailableCurrencies(requestedCurrencyNames)
             .map { CurrencyResponse(it.name, it.longName) }

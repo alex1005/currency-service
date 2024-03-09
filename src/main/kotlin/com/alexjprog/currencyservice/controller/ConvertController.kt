@@ -17,7 +17,7 @@ class ConvertController @Autowired constructor(
     fun getConvertedCurrencies(
         @RequestParam("from_cur", defaultValue = "UAH") fromCurrencyName: String,
         @RequestParam("amount", required = true) amount: Double,
-        @RequestParam("to_curs", required = false) toCurrencyNames: List<String>
+        @RequestParam("to_curs", required = false, defaultValue = "") toCurrencyNames: List<String>
     ): ConversionResponse {
         return ConversionResponse(
             inputCurrencyName = fromCurrencyName,

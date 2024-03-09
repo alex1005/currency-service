@@ -42,7 +42,7 @@ class CurrencyServiceImpl @Autowired constructor(
         amount: Double,
         toNames: List<String>
     ): List<ConversionResultModel> {
-        if(amount < 0.0) throw WrongAmountException(amount)
+        if(amount <= 0.0) throw WrongAmountException(amount)
         return loadRatesForCurrency(fromName, toNames).map {
             ConversionResultModel(it, amount, convertCurrency(amount, it.rate))
         }.toList()
@@ -50,11 +50,16 @@ class CurrencyServiceImpl @Autowired constructor(
 
     private fun loadRatesForCurrency(fromName: String, toNames: List<String>): List<RateModel> {
         return if(toNames.isEmpty()) {
-            rateRepository.findById_InputCurrency_NameOrderById_OutputCurrency_NameAsc(fromName).toList()
+            val result = rateRepository.findById_InputCurrency_NameOrderById_OutputCurrency_NameAsc(fromName).toList()
+            if(result.isEmpty()) throw WrongBaseCurrencyException(fromName)
+
+            result
         } else {
             val result = rateRepository.findById_InputCurrency_NameAndId_OutputCurrency_NameInOrderById_OutputCurrency_NameAsc(fromName, toNames).toList()
-            if(result.isEmpty()) throw WrongBaseCurrencyException(fromName)
             if(result.size != toNames.size) {
+                val allResult = rateRepository.findById_InputCurrency_NameOrderById_OutputCurrency_NameAsc(fromName).toList()
+                if(allResult.isEmpty()) throw WrongBaseCurrencyException(fromName)
+
                 val resultNames = result.map { it.id.outputCurrency.name }
                 val unknownCurrencies = toNames.filter { it !in resultNames }
                 if (unknownCurrencies.isNotEmpty()) throw WrongCurrenciesException(unknownCurrencies)
